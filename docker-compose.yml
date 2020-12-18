@@ -1,0 +1,54 @@
+version: '3.7'
+
+services:
+  backend_api:
+    container_name: "backend_api-${ENVIRONMENT}"
+    restart: always
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      args:
+        - ENVIRONMENT=${ENVIRONMENT}
+        - FLASK_RUN_HOST=${FLASK_HOST}
+        - FLASK_RUN_PORT=${FLASK_PORT}
+        - FLASK_APP=${FLASK_APP}
+        - DATABASE_URL=${DATABASE_PREFIX}${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
+        - WAIT_HOSTS=postgres:${POSTGRES_PORT_CONTAINER}
+        - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT}
+        - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL}
+        - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT}
+    command: bash -c "/wait && sh ./start.sh"
+    ports:
+    - "${FLASK_PORT}:${FLASK_PORT}"
+    networks:
+    - backend_net
+    - frontend_net
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: "postgres-container"
+    image: postgres:13.1-alpine
+    restart: always
+    expose:
+      - "${POSTGRES_PORT_CONTAINER}"
+    environment:
+      - LC_ALL=${POSTGRES_LANG}
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    name: backend_net
+    driver: "bridge"
+  frontend_net:
+    name: frontend_net
+    driver: "bridge"
+
+volumes:
+  postgres_data:
