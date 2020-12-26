@@ -7,11 +7,9 @@ environment variable FLASK_APP to point where the entrypoint is
 import json
 import click
 
-from src import create_app
+from src import create_app, db
 
 app = create_app()
-
-# Import here models after creating app
 
 
 # Adding some CLI command
@@ -33,6 +31,21 @@ def hello():
 @app.route('/hello/<name>')
 def hello_name(name):
     return "Hello {} !".format(name)
+
+
+@app.route('/test_users')
+def test():
+    from src.main.model.user import User
+    result = User.query.all()
+    data_res = {}
+    for res in result:
+        print(type(res.password))
+        data_res = ({
+            "username": res.username,
+            "password": res.password.hash.decode('utf-8')
+        })
+
+    return data_res, 200
 
 
 if __name__ == '__main__':

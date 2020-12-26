@@ -3,7 +3,7 @@ FROM python:3.6.9-alpine
 
 RUN apk add --no-cache bash
 RUN apk add --no-cache postgresql-libs
-RUN apk add --no-cache --virtual .build-deps gcc python3-dev musl-dev postgresql-dev
+RUN apk add --no-cache --virtual .build-deps gcc python3-dev musl-dev postgresql-dev libffi-dev
 
 RUN pip install --upgrade pip
 

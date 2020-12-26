@@ -5,8 +5,6 @@ import os
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from alembic import op
-from sqlalchemy import table, column, String, Integer, Enum
 
 from config import CONFIG_BY_NAME
 
@@ -29,6 +27,7 @@ def create_app():
     db.init_app(app)
 
     # Import model for SQL Alchemy - Alembic migration
+    #from src.main.model.user import User
 
     # Migration init
     migrate.init_app(app, db)
