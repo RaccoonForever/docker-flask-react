@@ -42,6 +42,20 @@ services:
     networks:
       - backend_net
 
+  frontend:
+    container_name: "frontend"
+    build:
+      context: ./frontend
+      dockerfile: frontend/Dockerfile.${ENVIRONMENT}
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - frontend_net
+
 networks:
   backend_net:
     name: backend_net

@@ -16,20 +16,21 @@ def create_app():
     """
     Method to call to get the web application initialized
     """
-    app = flask.Flask(__name__)
+    app = flask.Flask(__name__, template_folder="../templates")
     app.config.from_object(CONFIG_BY_NAME[os.getenv('ENVIRONMENT', 'development')])
     print("--- {} Environment initialized ---".format(app.config['ENVIRONMENT']))
-
-    # Registering blueprints etc...
-    # app.app_context().push()
 
     # DB Init
     db.init_app(app)
 
-    # Import model for SQL Alchemy - Alembic migration
-    #from src.main.model.user import User
-
     # Migration init
     migrate.init_app(app, db)
+
+    # Register blueprints
+    from src.main.flask.blueprint import authentication as auth
+    from src.main.flask.blueprint import main as main_blueprint
+
+    app.register_blueprint(auth.authentication)
+    app.register_blueprint(main_blueprint.main)
 
     return app
